@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Google reCAPTCHA</title>
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+</head>
+<body>
+<style>
+    .error {
+        color: red;
+        font-size: 12px;
+    }
+    .error, .success {
+        display: none;
+    }
+    .visible {
+        display: block !important;
+    }
+</style>
+<form>
+    <div class="g-recaptcha" data-sitekey="6LcX7L0ZAAAAAAsXwgJ7iZfo8WlPtUozlO1yIfOm"></div>
+    <hr/>
+    <button type="submit">Отправить</button>
+    <p class="error">Вы не прошли проверку робота, попробуйте еще раз</p>
+    <p class="success">Успешно отправлено!</p>
+</form>
+
+<script>
+    const success = document.querySelector('.success');
+    const error = document.querySelector('.error');
+    let object = {};
+    document.querySelector('button').addEventListener('click', (e) => {
+        e.preventDefault();
+        const formData = new FormData(document.querySelector('form'));
+        formData.forEach(function (value, key) {
+            object[key] = value;
+        });
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'send.php');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.send('param=' + JSON.stringify(object));
+        xhr.addEventListener("readystatechange", () => {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                console.log(xhr.response);
+                if (xhr.response === 'empty') {
+                    grecaptcha.reset();
+                    error.classList.add('visible');
+                    setTimeout(() => {
+                        error.classList.remove('visible');
+                    }, 3000)
+                }
+                if (xhr.response === 'robot') {
+                    grecaptcha.reset();
+                    error.classList.add('visible');
+                    setTimeout(() => {
+                        error.classList.remove('visible');
+                    }, 3000)
+                }
+                if (xhr.response === 'success') {
+                    console.log('Успех');
+                    success.classList.add('visible');
+                    setTimeout(() => {
+                        success.classList.remove('visible');
+                    }, 3000)
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>
