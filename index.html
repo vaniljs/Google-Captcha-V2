@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Google reCAPTCHA</title>
-    <script src="https://www.google.com/recaptcha/api.js"></script>
 </head>
 <body>
 <style>
+    button:disabled {
+        color: red;
+    }
     .error {
         color: red;
         font-size: 12px;
@@ -19,14 +21,59 @@
     }
 </style>
 <form>
-    <div class="g-recaptcha" data-sitekey="6LcX7L0ZAAAAAAsXwgJ7iZfo8WlPtUozlO1yIfOm"></div>
+    <div class="g-recaptcha" data-sitekey="6LeCl78cAAAAAF35acuA-v2Iiq9zepMFG2asefnB"></div>
     <hr/>
-    <button type="submit">Отправить</button>
+    <button type="submit" disabled>Отправить</button>
     <p class="error">Вы не прошли проверку робота, попробуйте еще раз</p>
     <p class="success">Успешно отправлено!</p>
 </form>
 
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
 <script>
+    window.addEventListener('load', () => {
+
+    });
+
+    const capKey = '6LeCl78cAAAAAF35acuA-v2Iiq9zepMFG2asefnB'
+
+    var onloadCallback = function() {
+        document.querySelectorAll('.g-recaptcha').forEach(captcha => {
+            grecaptcha.render(captcha, {
+                'sitekey': capKey,
+                'theme': 'light',
+                'size': 'normal',
+                'callback': callBackCaptcha,
+                'expired-callback': expiredCallBackCaptcha,
+                'error-callback': errorCallBackCaptcha
+            });
+        });
+        console.log('render..');
+    }
+
+
+    function callBackCaptcha() {
+        console.log('Checked captcha');
+        document.querySelector('button').disabled = false
+    }
+
+    function expiredCallBackCaptcha() {
+        console.log('Expired captcha');
+    }
+
+    function errorCallBackCaptcha() {
+        console.log('Error captcha');
+    }
+
+
+    function resetAllCaptcha() {
+        document.querySelectorAll('.g-recaptcha').forEach(captcha => {
+            grecaptcha.reset(captcha);
+        });
+        grecaptcha.reset();
+        console.log('Captcha reset..');
+    }
+
+
     const success = document.querySelector('.success');
     const error = document.querySelector('.error');
     let object = {};
@@ -44,14 +91,14 @@
             if (xhr.readyState === 4 && xhr.status === 200) {
                 console.log(xhr.response);
                 if (xhr.response === 'empty') {
-                    grecaptcha.reset();
+                    resetAllCaptcha()
                     error.classList.add('visible');
                     setTimeout(() => {
                         error.classList.remove('visible');
                     }, 3000)
                 }
                 if (xhr.response === 'robot') {
-                    grecaptcha.reset();
+                    resetAllCaptcha()
                     error.classList.add('visible');
                     setTimeout(() => {
                         error.classList.remove('visible');
@@ -59,6 +106,7 @@
                 }
                 if (xhr.response === 'success') {
                     console.log('Успех');
+                    resetAllCaptcha()
                     success.classList.add('visible');
                     setTimeout(() => {
                         success.classList.remove('visible');

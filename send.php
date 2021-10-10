@@ -2,13 +2,13 @@
 $param = json_decode($_REQUEST["param"]);
 
 // var_dump($_POST);
-//echo $param->{'g-recaptcha-response'};
+// echo $param->{'g-recaptcha-response'};
 
 if (!$param->{'g-recaptcha-response'}) {
     exit("empty");
 } else {
     $url = "https://www.google.com/recaptcha/api/siteverify";
-    $key = "6LcX7L0ZAAAAAK_DFNLvM7aG2lXiHsQgbtBf6uQH";
+    $key = "6LeYg78cAAAAAN_5TX3kwjn9DPc_Yt80FwMDSE2I";
     $query = array(
         "secret" => $key,
         "response" => $param->{'g-recaptcha-response'},
@@ -27,4 +27,3 @@ if (!$param->{'g-recaptcha-response'}) {
         echo "success";
     }
 }
-?>
